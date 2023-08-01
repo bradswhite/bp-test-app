@@ -1,13 +1,11 @@
 import EditPostCell from 'src/components/Post/EditPostCell'
-import toastPropsType from 'src/types/toast';
 
 type PostPageProps = {
-  id: number;
-  toast: toastPropsType;
+  id: number
 }
 
-const EditPostPage = ({ id, toast }: PostPageProps) => {
-  return <EditPostCell id={id} toast={toast} />
+const EditPostPage = ({ id }: PostPageProps) => {
+  return <EditPostCell id={id} />
 }
 
 export default EditPostPage

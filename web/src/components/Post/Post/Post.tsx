@@ -1,9 +1,8 @@
 import { Link, routes, navigate } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
-import Button from "src/components/UIComponents/shared/Button";
-import Table from "src/components/UIComponents/Table";
+import { toast } from '@redwoodjs/web/toast'
 
-import { timeTag, truncate } from 'src/lib/formatters'
+import { timeTag } from 'src/lib/formatters'
 
 import type { DeletePostMutationVariables, FindPostById } from 'types/graphql'
 
@@ -19,19 +18,15 @@ interface Props {
   post: NonNullable<FindPostById['post']>
 }
 
-const Post = ({ post: { id, title, body, createdAt } }: Props) => {
+const Post = ({ post }: Props) => {
   const [deletePost] = useMutation(DELETE_POST_MUTATION, {
     onCompleted: () => {
-      setToastTitle('Deletion Successful');
-      setToastDesc(`Post ${id} deleted`);
-      toggleToast();
+      toast.success('Post deleted')
       navigate(routes.posts())
     },
     onError: (error) => {
-      setToastTitle('Error Deleting Post');
-      setToastDesc(error.message);
-      toggleToast();
-    }
+      toast.error(error.message)
+    },
   })
 
   const onDeleteClick = (id: DeletePostMutationVariables['id']) => {
@@ -42,33 +37,52 @@ const Post = ({ post: { id, title, body, createdAt } }: Props) => {
 
   return (
     <>
-      <Table
-        headings={[ `Post ${id} Detail` ]}
-        dataRows={[
-          [ 'Id', truncate(id) ],
-          [ 'Title', truncate(title) ],
-          [ 'Body', truncate(body) ],
-          [ 'Created at', timeTag(createdAt) ]
-        ]}
-      />
-
-      <div className='w-full flex justify-center py-6'>
-        <nav className='flex gap-4'>
-          <Link
-            to={routes.editPost({ id })}
-            title={'Edit post ' + id + ' detail'}
-          >
-            <Button color='blue'>Edit</Button>
-          </Link>
-          <Button
-            title={'Delete post ' + id}
-            color='red'
-            onClick={() => onDeleteClick(id)}
-          >
-            Delete
-          </Button>
-        </nav>
+      <div className="rw-segment">
+        <header className="rw-segment-header">
+          <h2 className="rw-heading rw-heading-secondary">
+            Post {post.id} Detail
+          </h2>
+        </header>
+        <table className="rw-table">
+          <tbody>
+            <tr>
+              <th>Id</th>
+              <td>{post.id}</td>
+            </tr>
+            <tr>
+              <th>Title</th>
+              <td>{post.title}</td>
+            </tr>
+            <tr>
+              <th>Body</th>
+              <td>{post.body}</td>
+            </tr>
+            <tr>
+              <th>Created at</th>
+              <td>{timeTag(post.createdAt)}</td>
+            </tr>
+            <tr>
+              <th>Author id</th>
+              <td>{post.authorId}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+      <nav className="rw-button-group">
+        <Link
+          to={routes.editPost({ id: post.id })}
+          className="rw-button rw-button-blue"
+        >
+          Edit
+        </Link>
+        <button
+          type="button"
+          className="rw-button rw-button-red"
+          onClick={() => onDeleteClick(post.id)}
+        >
+          Delete
+        </button>
+      </nav>
     </>
   )
 }

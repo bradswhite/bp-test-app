@@ -4,21 +4,25 @@ export const schema = gql`
     title: String!
     body: String!
     createdAt: DateTime!
+    author: User!
+    authorId: Int!
   }
 
   type Query {
-    posts: [Post!]! @skipAuth
-    post(id: Int!): Post @skipAuth
+    posts: [Post!]! @requireAuth
+    post(id: Int!): Post @requireAuth
   }
 
   input CreatePostInput {
     title: String!
     body: String!
+    authorId: Int!
   }
 
   input UpdatePostInput {
     title: String
     body: String
+    authorId: Int
   }
 
   type Mutation {
